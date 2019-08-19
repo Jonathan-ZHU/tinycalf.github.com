@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/180.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/180.png?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="truffle 是以太坊智能合约Solidity编程的IDE之一。 它能在没有搭建geth/parity等以太坊节点的情况下发布并调试合约。在truffle中可以用传统的nodejs测试模块为合约编写测试脚本，并且帮助你省去了 “发布合约-调试合约-重新发布合约” 的麻烦。本篇旨在说明truffle最核心的操作流程，帮助快速上手使用。  安装 npm nodejs我这以前有一篇快速安装教程， 看">
+<meta name="keywords" content="ethereum,solidity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="truffle以太坊智能合约开发环境搭建">
+<meta property="og:url" content="http://www.tiny-calf.com/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/index.html">
+<meta property="og:site_name" content="Tiny Calf">
+<meta property="og:description" content="truffle 是以太坊智能合约Solidity编程的IDE之一。 它能在没有搭建geth/parity等以太坊节点的情况下发布并调试合约。在truffle中可以用传统的nodejs测试模块为合约编写测试脚本，并且帮助你省去了 “发布合约-调试合约-重新发布合约” 的麻烦。本篇旨在说明truffle最核心的操作流程，帮助快速上手使用。  安装 npm nodejs我这以前有一篇快速安装教程， 看">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-19T11:22:07.558Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="truffle以太坊智能合约开发环境搭建">
+<meta name="twitter:description" content="truffle 是以太坊智能合约Solidity编程的IDE之一。 它能在没有搭建geth/parity等以太坊节点的情况下发布并调试合约。在truffle中可以用传统的nodejs测试模块为合约编写测试脚本，并且帮助你省去了 “发布合约-调试合约-重新发布合约” 的麻烦。本篇旨在说明truffle最核心的操作流程，帮助快速上手使用。  安装 npm nodejs我这以前有一篇快速安装教程， 看">
+
+
+
+
+
+
+  <link rel="canonical" href="http://www.tiny-calf.com/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>truffle以太坊智能合约开发环境搭建 | Tiny Calf</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d9139a8cd69f64bff973069819adf72";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+      <div class="site-meta-headline">
+        <a>
+          <img class="custom-logo-image" src="/images/logo.png" alt="Tiny Calf" style="width:150px">
+        </a>
+      </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-booklist">
+    <a href="/booklist/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+</li>
+
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.tiny-calf.com/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="TinyCalf">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tiny Calf">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">truffle以太坊智能合约开发环境搭建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-27T18:10:37+08:00">2018-06-27</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/区块链/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/" class="leancloud_visitors" data-flag-title="truffle以太坊智能合约开发环境搭建">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>truffle 是以太坊智能合约Solidity编程的IDE之一。 它能在没有搭建geth/parity等以太坊节点的情况下发布并调试合约。在truffle中可以用传统的nodejs测试模块为合约编写测试脚本，并且帮助你省去了 “发布合约-调试合约-重新发布合约” 的麻烦。本篇旨在说明truffle最核心的操作流程，帮助快速上手使用。</p>
+</blockquote>
+<h2 id="安装-npm-nodejs"><a href="#安装-npm-nodejs" class="headerlink" title="安装 npm nodejs"></a>安装 npm nodejs</h2><p>我这以前有一篇快速安装教程， <a href="https://www.tiny-calf.com/2017/07/20/Node.js%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85/">看这里</a></p>
+<h2 id="安装truffle"><a href="#安装truffle" class="headerlink" title="安装truffle"></a>安装truffle</h2><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm <span class="keyword">install</span> -g truffle</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="新建truffle项目"><a href="#新建truffle项目" class="headerlink" title="新建truffle项目"></a>新建truffle项目</h2><p>官网关于这部分的详细说明在<a href="https://truffleframework.com/docs/getting_started/project" target="_blank" rel="noopener">这里</a><br>我们可以直接创建项目：<br><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> MetaCoin</span><br><span class="line"><span class="built_in">cd</span> MetaCoin</span><br><span class="line">truffle unbox metacoin</span><br></pre></td></tr></table></figure></p>
+<p>metacoin是truffle已经存在的一个box，你也可以新建其他box，box其实就是一个可以直接发布的合约模板，包含了项目的源码和测试脚本等文件.你也可以创建一个空的项目：<br><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="built_in">path</span>/to/your/empty/<span class="built_in">dir</span></span><br><span class="line">truffle init</span><br></pre></td></tr></table></figure></p>
+<p>这里包括下面为了说明truffle各个功能，我创建了一个名叫TinyCoin的项目，里面会写一个标准的ERC20合约：<br><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> TinyCoin</span><br><span class="line"><span class="built_in">cd</span> TinyCoin</span><br><span class="line">truffle init</span><br></pre></td></tr></table></figure></p>
+<p>完成以后目录会有几文件夹，分别是：</p>
+<ul>
+<li>contracts 存放合约solidity源码</li>
+<li>migrates  存放js写的迁移脚本,帮助你发布合约</li>
+<li>test 存放js写的测试脚本</li>
+</ul>
+<h2 id="写一个智能合约"><a href="#写一个智能合约" class="headerlink" title="写一个智能合约"></a>写一个智能合约</h2><p>这里我在contracts文件夹下面写了一个标准的ERC20合约,文件名为TinyCoin.sol：<br><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.4</span>.<span class="number">18</span>;</span><br><span class="line"></span><br><span class="line">interface tokenRecipient &#123; function receiveApproval (address <span class="variable">_from</span>, uint256 <span class="variable">_value</span>, address <span class="variable">_token</span>, bytes <span class="variable">_extraData</span>) external; &#125;</span><br><span class="line"></span><br><span class="line">contract TinyCoin &#123;</span><br><span class="line">    <span class="comment">// Public variables of the token</span></span><br><span class="line">    string public <span class="built_in">name</span>;</span><br><span class="line">    string public symbol;</span><br><span class="line">    uint8 public decimals = <span class="number">18</span>;</span><br><span class="line">    <span class="comment">// 18 decimals is the strongly suggested default, avoid changing it</span></span><br><span class="line">    uint256 public totalSupply;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// This creates an array with all balances</span></span><br><span class="line">    mapping (address =&gt; uint256) public balanceOf;</span><br><span class="line">    mapping (address =&gt; mapping (address =&gt; uint256)) public allowance;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// This generates a public event on the blockchain that will notify clients</span></span><br><span class="line">    event Transfer(address indexed <span class="keyword">from</span>, address indexed <span class="keyword">to</span>, uint256 value);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// This notifies clients about the amount burnt</span></span><br><span class="line">    event Burn(address indexed <span class="keyword">from</span>, uint256 value);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Constrctor function</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Initializes contract with initial supply tokens to the creator of the contract</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    constructor(</span><br><span class="line">        uint256 initialSupply,</span><br><span class="line">        string tokenName,</span><br><span class="line">        string tokenSymbol</span><br><span class="line">    ) public &#123;</span><br><span class="line">        totalSupply = initialSupply * <span class="number">10</span> ** uint256(decimals);  <span class="comment">// Update total supply with the decimal amount</span></span><br><span class="line">        balanceOf[msg.sender] = totalSupply;                <span class="comment">// Give the creator all initial tokens</span></span><br><span class="line">        <span class="built_in">name</span> = tokenName;                                   <span class="comment">// Set the name for display purposes</span></span><br><span class="line">        symbol = tokenSymbol;                               <span class="comment">// Set the symbol for display purposes</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Internal transfer, only can be called by this contract</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    function <span class="variable">_transfer</span>(address <span class="variable">_from</span>, address <span class="variable">_to</span>, uint <span class="variable">_value</span>) internal &#123;</span><br><span class="line">        <span class="comment">// Prevent transfer to 0x0 address. Use burn() instead</span></span><br><span class="line">        require(<span class="variable">_to</span> != <span class="number">0</span>x0);</span><br><span class="line">        <span class="comment">// Check if the sender has enough</span></span><br><span class="line">        require(balanceOf[<span class="variable">_from</span>] &gt;= <span class="variable">_value</span>);</span><br><span class="line">        <span class="comment">// Check for overflows</span></span><br><span class="line">        require(balanceOf[<span class="variable">_to</span>] + <span class="variable">_value</span> &gt; balanceOf[<span class="variable">_to</span>]);</span><br><span class="line">        <span class="comment">// Save this for an assertion in the future</span></span><br><span class="line">        uint previousBalances = balanceOf[<span class="variable">_from</span>] + balanceOf[<span class="variable">_to</span>];</span><br><span class="line">        <span class="comment">// Subtract from the sender</span></span><br><span class="line">        balanceOf[<span class="variable">_from</span>] -= <span class="variable">_value</span>;</span><br><span class="line">        <span class="comment">// Add the same to the recipient</span></span><br><span class="line">        balanceOf[<span class="variable">_to</span>] += <span class="variable">_value</span>;</span><br><span class="line">        emit Transfer(<span class="variable">_from</span>, <span class="variable">_to</span>, <span class="variable">_value</span>);</span><br><span class="line">        <span class="comment">// Asserts are used to use static analysis to find bugs in your code. They should never fail</span></span><br><span class="line">        <span class="built_in">assert</span>(balanceOf[<span class="variable">_from</span>] + balanceOf[<span class="variable">_to</span>] == previousBalances);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Transfer tokens</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Send `_value` tokens to `_to` from your account</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param _to The address of the recipient</span></span><br><span class="line"><span class="comment">     * @param _value the amount to send</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    function transfer(address <span class="variable">_to</span>, uint256 <span class="variable">_value</span>) public &#123;</span><br><span class="line">        <span class="variable">_transfer</span>(msg.sender, <span class="variable">_to</span>, <span class="variable">_value</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Transfer tokens from other address</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Send `_value` tokens to `_to` in behalf of `_from`</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param _from The address of the sender</span></span><br><span class="line"><span class="comment">     * @param _to The address of the recipient</span></span><br><span class="line"><span class="comment">     * @param _value the amount to send</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    function transferFrom(address <span class="variable">_from</span>, address <span class="variable">_to</span>, uint256 <span class="variable">_value</span>) public returns (bool success) &#123;</span><br><span class="line">        require(<span class="variable">_value</span> &lt;= allowance[<span class="variable">_from</span>][msg.sender]);     <span class="comment">// Check allowance</span></span><br><span class="line">        allowance[<span class="variable">_from</span>][msg.sender] -= <span class="variable">_value</span>;</span><br><span class="line">        <span class="variable">_transfer</span>(<span class="variable">_from</span>, <span class="variable">_to</span>, <span class="variable">_value</span>);</span><br><span class="line">        return <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Set allowance for other address</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Allows `_spender` to spend no more than `_value` tokens in your behalf</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param _spender The address authorized to spend</span></span><br><span class="line"><span class="comment">     * @param _value the max amount they can spend</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    function approve(address <span class="variable">_spender</span>, uint256 <span class="variable">_value</span>) public</span><br><span class="line">        returns (bool success) &#123;</span><br><span class="line">        allowance[msg.sender][<span class="variable">_spender</span>] = <span class="variable">_value</span>;</span><br><span class="line">        return <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Set allowance for other address and notify</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Allows `_spender` to spend no more than `_value` tokens in your behalf, and then ping the contract about it</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param _spender The address authorized to spend</span></span><br><span class="line"><span class="comment">     * @param _value the max amount they can spend</span></span><br><span class="line"><span class="comment">     * @param _extraData some extra information to send to the approved contract</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    function approveAndCall(address <span class="variable">_spender</span>, uint256 <span class="variable">_value</span>, bytes <span class="variable">_extraData</span>)</span><br><span class="line">        public</span><br><span class="line">        returns (bool success) &#123;</span><br><span class="line">        tokenRecipient spender = tokenRecipient(<span class="variable">_spender</span>);</span><br><span class="line">        <span class="keyword">if</span> (approve(<span class="variable">_spender</span>, <span class="variable">_value</span>)) &#123;</span><br><span class="line">            spender.receiveApproval(msg.sender, <span class="variable">_value</span>, this, <span class="variable">_extraData</span>);</span><br><span class="line">            return <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Destroy tokens</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Remove `_value` tokens from the system irreversibly</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param _value the amount of money to burn</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    function burn(uint256 <span class="variable">_value</span>) public returns (bool success) &#123;</span><br><span class="line">        require(balanceOf[msg.sender] &gt;= <span class="variable">_value</span>);   <span class="comment">// Check if the sender has enough</span></span><br><span class="line">        balanceOf[msg.sender] -= <span class="variable">_value</span>;            <span class="comment">// Subtract from the sender</span></span><br><span class="line">        totalSupply -= <span class="variable">_value</span>;                      <span class="comment">// Updates totalSupply</span></span><br><span class="line">        emit Burn(msg.sender, <span class="variable">_value</span>);</span><br><span class="line">        return <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Destroy tokens from other account</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Remove `_value` tokens from the system irreversibly on behalf of `_from`.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param _from the address of the sender</span></span><br><span class="line"><span class="comment">     * @param _value the amount of money to burn</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    function burnFrom(address <span class="variable">_from</span>, uint256 <span class="variable">_value</span>) public returns (bool success) &#123;</span><br><span class="line">        require(balanceOf[<span class="variable">_from</span>] &gt;= <span class="variable">_value</span>);                <span class="comment">// Check if the targeted balance is enough</span></span><br><span class="line">        require(<span class="variable">_value</span> &lt;= allowance[<span class="variable">_from</span>][msg.sender]);    <span class="comment">// Check allowance</span></span><br><span class="line">        balanceOf[<span class="variable">_from</span>] -= <span class="variable">_value</span>;                         <span class="comment">// Subtract from the targeted balance</span></span><br><span class="line">        allowance[<span class="variable">_from</span>][msg.sender] -= <span class="variable">_value</span>;             <span class="comment">// Subtract from the sender's allowance</span></span><br><span class="line">        totalSupply -= <span class="variable">_value</span>;                              <span class="comment">// Update totalSupply</span></span><br><span class="line">        emit Burn(<span class="variable">_from</span>, <span class="variable">_value</span>);</span><br><span class="line">        return <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>另外在这个文件夹下面还自带一个migration的合约，是truffle用来做迁移用的，可以暂时不用管</p>
+<h2 id="迁移脚本"><a href="#迁移脚本" class="headerlink" title="迁移脚本"></a>迁移脚本</h2><p>这个内容在官网<a href="https://truffleframework.com/docs/getting_started/migrations" target="_blank" rel="noopener">这里</a>可以查到。<br>在migrates文件夹下面新建一个<code>2_deploy_contracts.js</code>的文件，里面写上发布合约的内容，内容基本是固定的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> TinyCoin = artifacts.require(<span class="string">"./TinyCoin.sol"</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">deployer</span>) </span>&#123;</span><br><span class="line">  deployer.deploy(TinyCoin, <span class="number">10000</span>, <span class="string">"TinyCoin"</span>, <span class="string">"TINY"</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>如果合约需要传参数，像上面一样把无论多少个参数跟在deploy后面就行。我这里是三个参数。<br>官网也给出更多发布合约函数的例子:<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Deploy a single contract without constructor arguments</span></span><br><span class="line"><span class="selector-tag">deployer</span><span class="selector-class">.deploy</span>(A);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Deploy a single contract with constructor arguments</span></span><br><span class="line"><span class="selector-tag">deployer</span><span class="selector-class">.deploy</span>(A, arg1, arg2, ...);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Don't deploy this contract if it has already been deployed</span></span><br><span class="line"><span class="selector-tag">deployer</span><span class="selector-class">.deploy</span>(A, &#123;<span class="attribute">overwrite</span>: false&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Set a maximum amount of gas and `from` address for the deployment</span></span><br><span class="line"><span class="selector-tag">deployer</span><span class="selector-class">.deploy</span>(A, &#123;<span class="attribute">gas</span>: <span class="number">4612388</span>, <span class="attribute">from</span>: <span class="string">"0x...."</span>&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Deploy multiple contracts, some with arguments and some without.</span></span><br><span class="line"><span class="comment">// This is quicker than writing three `deployer.deploy()` statements as the deployer</span></span><br><span class="line"><span class="comment">// can perform the deployment as a single batched request.</span></span><br><span class="line"><span class="selector-tag">deployer</span><span class="selector-class">.deploy</span>([</span><br><span class="line">  [A, arg1, arg2, ...],</span><br><span class="line">  B,</span><br><span class="line">  [C, arg1]</span><br><span class="line">]);</span><br><span class="line"></span><br><span class="line"><span class="comment">// External dependency example:</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// For this example, our dependency provides an address when we're deploying to the</span></span><br><span class="line"><span class="comment">// live network, but not for any other networks like testing and development.</span></span><br><span class="line"><span class="comment">// When we're deploying to the live network we want it to use that address, but in</span></span><br><span class="line"><span class="comment">// testing and development we need to deploy a version of our own. Instead of writing</span></span><br><span class="line"><span class="comment">// a bunch of conditionals, we can simply use the `overwrite` key.</span></span><br><span class="line"><span class="selector-tag">deployer</span><span class="selector-class">.deploy</span>(SomeDependency, &#123;<span class="attribute">overwrite</span>: false&#125;);</span><br></pre></td></tr></table></figure></p>
+<h2 id="以太坊虚拟机调试环境"><a href="#以太坊虚拟机调试环境" class="headerlink" title="以太坊虚拟机调试环境"></a>以太坊虚拟机调试环境</h2><h3 id="启动truffle自带的evm"><a href="#启动truffle自带的evm" class="headerlink" title="启动truffle自带的evm"></a>启动truffle自带的evm</h3><p>truffle能支持所有evm, 包括geth/parit等等，这里最快最方便的调试方法是truffle自带的evm，你不需要任何安装，并且能完成打包发布等操作,在项目目录下启动：<br><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">truffle develop</span></span><br></pre></td></tr></table></figure></p>
+<p>然后就能进入命令行界面：<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Truffle</span> <span class="selector-tag">Develop</span> <span class="selector-tag">started</span> <span class="selector-tag">at</span> <span class="selector-tag">http</span>:<span class="comment">//127.0.0.1:9545/</span></span><br><span class="line"></span><br><span class="line"><span class="selector-tag">Accounts</span>:</span><br><span class="line">(<span class="number">0</span>) <span class="selector-tag">0x627306090abab3a6e1400e9345bc60c78a8bef57</span></span><br><span class="line">(<span class="number">1</span>) <span class="selector-tag">0xf17f52151ebef6c7334fad080c5704d77216b732</span></span><br><span class="line">(<span class="number">2</span>) <span class="selector-tag">0xc5fdf4076b8f3a5357c5e395ab970b5b54098fef</span></span><br><span class="line">(<span class="number">3</span>) <span class="selector-tag">0x821aea9a577a9b44299b9c15c88cf3087f3b5544</span></span><br><span class="line">(<span class="number">4</span>) <span class="selector-tag">0x0d1d4e623d10f9fba5db95830f7d3839406c6af2</span></span><br><span class="line">(<span class="number">5</span>) <span class="selector-tag">0x2932b7a2355d6fecc4b5c0b6bd44cc31df247a2e</span></span><br><span class="line">(<span class="number">6</span>) <span class="selector-tag">0x2191ef87e392377ec08e7c08eb105ef5448eced5</span></span><br><span class="line">(<span class="number">7</span>) <span class="selector-tag">0x0f4f2ac550a1b4e2280d04c21cea7ebd822934b5</span></span><br><span class="line">(<span class="number">8</span>) <span class="selector-tag">0x6330a553fc93768f612722bb8c2ec78ac90b3bbc</span></span><br><span class="line">(<span class="number">9</span>) <span class="selector-tag">0x5aeda56215b167893e80b4fe645ba6d5bab767de</span></span><br><span class="line"></span><br><span class="line"><span class="selector-tag">Private</span> <span class="selector-tag">Keys</span>:</span><br><span class="line">(<span class="number">0</span>) <span class="selector-tag">c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3</span></span><br><span class="line">(<span class="number">1</span>) <span class="selector-tag">ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f</span></span><br><span class="line">(<span class="number">2</span>) <span class="selector-tag">0dbbe8e4ae425a6d2687f1a7e3ba17bc98c673636790f1b8ad91193c05875ef1</span></span><br><span class="line">(<span class="number">3</span>) <span class="selector-tag">c88b703fb08cbea894b6aeff5a544fb92e78a18e19814cd85da83b71f772aa6c</span></span><br><span class="line">(<span class="number">4</span>) <span class="selector-tag">388c684f0ba1ef5017716adb5d21a053ea8e90277d0868337519f97bede61418</span></span><br><span class="line">(<span class="number">5</span>) <span class="selector-tag">659cbb0e2411a44db63778987b1e22153c086a95eb6b18bdf89de078917abc63</span></span><br><span class="line">(<span class="number">6</span>) <span class="selector-tag">82d052c865f5763aad42add438569276c00d3d88a2d062d36b2bae914d58b8c8</span></span><br><span class="line">(<span class="number">7</span>) <span class="selector-tag">aa3680d5d48a8283413f7a108367c7299ca73f553735860a87b08f39395618b7</span></span><br><span class="line">(<span class="number">8</span>) <span class="selector-tag">0f62d96d6675f32685bbdb8ac13cda7c23436f63efbb9d07700d8669ff12b7c4</span></span><br><span class="line">(<span class="number">9</span>) <span class="selector-tag">8d5366123cb560bb606379f90a0bfd4769eecc0557f1b362dcae9012b548b1e5</span></span><br><span class="line"></span><br><span class="line"><span class="selector-tag">Mnemonic</span>: <span class="selector-tag">candy</span> <span class="selector-tag">maple</span> <span class="selector-tag">cake</span> <span class="selector-tag">sugar</span> <span class="selector-tag">pudding</span> <span class="selector-tag">cream</span> <span class="selector-tag">honey</span> <span class="selector-tag">rich</span> <span class="selector-tag">smooth</span> <span class="selector-tag">crumble</span> <span class="selector-tag">sweet</span> <span class="selector-tag">treat</span></span><br><span class="line"></span><br><span class="line">⚠️  <span class="selector-tag">Important</span> ⚠️  : <span class="selector-tag">This</span> <span class="selector-tag">mnemonic</span> <span class="selector-tag">was</span> <span class="selector-tag">created</span> <span class="selector-tag">for</span> <span class="selector-tag">you</span> <span class="selector-tag">by</span> <span class="selector-tag">Truffle</span>. <span class="selector-tag">It</span> <span class="selector-tag">is</span> <span class="selector-tag">not</span> <span class="selector-tag">secure</span>.</span><br><span class="line"><span class="selector-tag">Ensure</span> <span class="selector-tag">you</span> <span class="selector-tag">do</span> <span class="selector-tag">not</span> <span class="selector-tag">use</span> <span class="selector-tag">it</span> <span class="selector-tag">on</span> <span class="selector-tag">production</span> <span class="selector-tag">blockchains</span>, <span class="selector-tag">or</span> <span class="selector-tag">else</span> <span class="selector-tag">you</span> <span class="selector-tag">risk</span> <span class="selector-tag">losing</span> <span class="selector-tag">funds</span>.</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">truffle</span>(develop)&gt;</span><br></pre></td></tr></table></figure></p>
+<p>可以看见在本地测试链上新建了很多帐号以供测试，每个帐号都有一些测试币。在命令行下，可以直接使用javascript和 web3.js的语法（用的web3不到1.0的语法，原因可能是web3 1.0有太多promise，不太适合命令行），比如获取钱包余额：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">truffle</span><span class="params">(develop)</span></span>&gt; web3<span class="selector-class">.eth</span><span class="selector-class">.getBalance</span>(<span class="string">"0x627306090abab3a6e1400e9345bc60c78a8bef57"</span>)</span><br><span class="line">BigNumber &#123; s: <span class="number">1</span>, e: <span class="number">20</span>, c: [ <span class="number">1000000</span> ] &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="编译打包智能合约"><a href="#编译打包智能合约" class="headerlink" title="编译打包智能合约"></a>编译打包智能合约</h3><p>然后就是最重要的,还是在这个命令行下，我们可以用一个命令编译我们刚才写的ERC20合约：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> compile</span></span><br></pre></td></tr></table></figure></p>
+<p>如果合约有error或者warning，都会在这里显示出来。完成编译后，我们可以看到新增了build文件夹,里面有编译后的json文件。正常编译合约会生成两个文件，或者说字符串，一个是abi（二进制接口），另一个是bin（二进制程序），这里的json文件是truffle整合的一个形式，其实里面包含了abi和bin。</p>
+<h3 id="自动发布合约"><a href="#自动发布合约" class="headerlink" title="自动发布合约"></a>自动发布合约</h3><p>ok，接下来我们刚才写的迁移脚本就起到作用了，我们输入命令来执行迁移脚本：<br><figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">truffle(develop)&gt; migrate</span><br><span class="line">Using network <span class="string">'develop'</span>.</span><br><span class="line"></span><br><span class="line">Running migration: <span class="number">1</span>_initial_migration.js</span><br><span class="line">  Replacing Migrations<span class="params">...</span></span><br><span class="line">  <span class="params">...</span> <span class="number">0x9637b2e62481e718f7ad1279bb27c523744303c82a15f23d1c66e5448e6d877d</span></span><br><span class="line">  Migrations: <span class="number">0x8cdaf0cd259887258bc13a92c0a6da92698644c0</span></span><br><span class="line">Saving successful migration <span class="keyword">to</span> network<span class="params">...</span></span><br><span class="line">  <span class="params">...</span> <span class="number">0xd7bc86d31bee32fa3988f1c1eabce403a1b5d570340a3a9cdba53a472ee8c956</span></span><br><span class="line">Saving artifacts<span class="params">...</span></span><br><span class="line">Running migration: <span class="number">2</span>_deploy_contracts.js</span><br><span class="line">  Replacing TinyCoin<span class="params">...</span></span><br><span class="line">  <span class="params">...</span> <span class="number">0x0fd1c57e3bee747e5d94568dabd2e1fcd808ca8368f79ddd72238f1d83996948</span></span><br><span class="line">  TinyCoin: <span class="number">0x345ca3e014aaf5dca488057592ee47305d9b3e10</span></span><br><span class="line">Saving successful migration <span class="keyword">to</span> network<span class="params">...</span></span><br><span class="line">  <span class="params">...</span> <span class="number">0xf36163615f41ef7ed8f4a8f192149a0bf633fe1a2398ce001bf44c43dc7bdda0</span></span><br><span class="line">Saving artifacts<span class="params">...</span></span><br></pre></td></tr></table></figure></p>
+<p>如果你不是第一个使用migrate，需要加个参数把以前的覆盖掉：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> migrate --reset</span></span><br></pre></td></tr></table></figure></p>
+<p>这样合约就运行在本地链上了,合约地址也显示在上面。</p>
+<h3 id="调试合约"><a href="#调试合约" class="headerlink" title="调试合约"></a>调试合约</h3><p>官方文档相关部分点<a href="https://truffleframework.com/docs/getting_started/debugging" target="_blank" rel="noopener">这里</a>。<br>然后我们用web3的语法发起一个ERC20转账的操作，转账操作会修改合约数据，所以是一个transfer操作（或者叫send操作，相反只查看区块链数据而不需要发起交易的方法叫call）:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">var</span> contract = web3<span class="selector-class">.eth</span><span class="selector-class">.contract</span>(TinyCoin.abi)</span><br><span class="line"><span class="selector-tag">var</span> contractInstance = contract.at(TinyCoin.address)</span><br><span class="line">contractInstance.transfer(web3<span class="selector-class">.eth</span><span class="selector-class">.accounts</span>[<span class="number">1</span>],web3.toWei(<span class="number">10</span>), &#123;from:web3<span class="selector-class">.eth</span><span class="selector-class">.accounts</span>[<span class="number">0</span>]&#125;)</span><br></pre></td></tr></table></figure>
+<p>就输出了一个hash值，这个hash就是调用合约transfer方法的交易的hash值，类似这样：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0xe57f3608e5696c5cb18ff2690ad88214150072258dc4cb63375e5d</span>3a47eb9909</span><br></pre></td></tr></table></figure></p>
+<p>我们现在有这个交易的hash值了，就可以调试这个已经完成的方法，我们只需要输入：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">debug</span> 0xe57f3608e5696c5cb18ff2690ad88214150072258dc4cb63375e5d3a47eb9909</span><br></pre></td></tr></table></figure></p>
+<p>就能看见调试的交互界面<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">truffle(develop)&gt; <span class="builtin-name">debug</span> 0xe57f3608e5696c5cb18ff2690ad88214150072258dc4cb63375e5d3a47eb9909</span><br><span class="line">Compiling ./contracts/Migrations.sol<span class="built_in">..</span>.</span><br><span class="line">Compiling ./contracts/TinyCoin.sol<span class="built_in">..</span>.</span><br><span class="line"></span><br><span class="line">Gathering transaction data<span class="built_in">..</span>.</span><br><span class="line"></span><br><span class="line">Addresses affected:</span><br><span class="line"> 0x345ca3e014aaf5dca488057592ee47305d9b3e10 - TinyCoin</span><br><span class="line"></span><br><span class="line">Commands:</span><br><span class="line">(enter) last command entered (<span class="keyword">step</span> next)</span><br><span class="line">(o) <span class="keyword">step</span> over, (i) <span class="keyword">step</span> into, (u) <span class="keyword">step</span> out, (n) <span class="keyword">step</span> next</span><br><span class="line">(;) <span class="keyword">step</span> instruction, (p) <span class="builtin-name">print</span> instruction, (h) <span class="builtin-name">print</span> this help, (q) quit</span><br><span class="line">(b) toggle breakpoint, (c) continue until breakpoint</span><br><span class="line">(+) <span class="builtin-name">add</span> watch expression (`+:&lt;expr&gt;`), (-) <span class="builtin-name">remove</span> watch expression (-:&lt;expr&gt;)</span><br><span class="line">(?) list existing watch expressions</span><br><span class="line">(v) <span class="builtin-name">print</span> variables <span class="keyword">and</span> values, (:) evaluate expression - see `v`</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TinyCoin.sol:</span><br><span class="line"></span><br><span class="line">3:<span class="built_in"> interface </span>tokenRecipient &#123; function receiveApproval (address _from, uint256 _value,<span class="built_in"> address </span>_token, bytes _extraData) external; &#125;</span><br><span class="line">4:</span><br><span class="line">5: contract TinyCoin &#123;</span><br><span class="line">   ^^^^^^^^^^^^^^^^^^^</span><br><span class="line"></span><br><span class="line"><span class="builtin-name">debug</span>(develop:0xe57f3608<span class="built_in">..</span>.)&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这个界面总是是逐步调试的，可以看到上面的Commands说明里就是这个debug界面的操作方法，比如enter进入调试的下一步，v可以显示当前步骤所有变量的值，还有断点之类的，就不具体说了。</p>
+<h3 id="编写测试脚本"><a href="#编写测试脚本" class="headerlink" title="编写测试脚本"></a>编写测试脚本</h3><p>然后我在<code>test/</code>目录下新建一个<code>tinycoin.js</code>的测试脚本，这里可以使用nodejs传统的mocha测试模块和chai断言库，但是truffle在mocha上又增加了一层，方便针对智能合约的调试。我们看一下这个文件：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> TinyCoin = artifacts.require(<span class="string">"./TinyCoin.sol"</span>)</span><br><span class="line"></span><br><span class="line">contract(<span class="string">"TinyCoin"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">accounts</span>) </span>&#123;</span><br><span class="line">	it(<span class="string">"should put 10000 tinycoin in the first account"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> TinyCoin.deployed().then(<span class="function"><span class="keyword">function</span>(<span class="params">instance</span>) </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> instance.balanceOf.call(accounts[<span class="number">0</span>]);</span><br><span class="line">		&#125;)</span><br><span class="line">		.then(<span class="function"><span class="params">balance</span>=&gt;</span>&#123;</span><br><span class="line">			balance = web3.fromWei(balance)</span><br><span class="line">			assert.equal(	balance, <span class="number">10000</span>)</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;)</span><br><span class="line">	it(<span class="string">`should succeed in a transfer</span></span><br><span class="line"><span class="string">      * status should be 0x1</span></span><br><span class="line"><span class="string">      * should have a Transfer event with correct output`</span> , ()=&gt;&#123;</span><br><span class="line">		<span class="keyword">return</span> TinyCoin.deployed().then( <span class="function"><span class="params">instance</span>=&gt;</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> instance.transfer(accounts[<span class="number">1</span>],web3.toWei(<span class="number">10</span>),&#123;<span class="attr">from</span>:accounts[<span class="number">0</span>]&#125;)</span><br><span class="line">		&#125;)</span><br><span class="line">		.then(<span class="function"><span class="params">ret</span>=&gt;</span>&#123;</span><br><span class="line">			assert.equal(ret.receipt.status, <span class="string">"0x1"</span>, <span class="string">`expect status to be 0x1`</span>)</span><br><span class="line">			<span class="keyword">var</span> eventTransfer = <span class="literal">null</span></span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; ret.logs.length; i++) &#123;</span><br><span class="line">    		<span class="keyword">var</span> log = ret.logs[i];</span><br><span class="line">				<span class="keyword">if</span>(log.event == <span class="string">"Transfer"</span>)</span><br><span class="line">							eventTransfer = log</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">//should have new event</span></span><br><span class="line">			assert(eventTransfer != <span class="literal">null</span>, <span class="string">'except event to be Transfer'</span>)</span><br><span class="line">			<span class="comment">//should have correct to,from and value</span></span><br><span class="line">			assert.equal(eventTransfer.args.from, accounts[<span class="number">0</span>], <span class="string">`expect from to be account0`</span>)</span><br><span class="line">			assert.equal(eventTransfer.args.to, accounts[<span class="number">1</span>], <span class="string">`expect to to be account1`</span>)</span><br><span class="line">			assert.equal(eventTransfer.args.value, web3.toWei(<span class="number">10</span>), <span class="string">`expect value to be 1000`</span>)</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>var TinyCoin = artifacts.require(&quot;./TinyCoin.sol&quot;)</code><br>哪里都通用，TinyCoin中包含了合约的所有信息（但不是合约实例，合约实例在deployed中）</li>
+<li><code>contract(&quot;TinyCoin&quot;, ...</code><br>mocha的describe在这里被替换成contract， 并且传进来所有帐号<code>accounts</code>方便我们调用合约方法。</li>
+<li><p>下面其中是一个测试样例，用以确认发起合约的帐号中确实存在 10000个 tinyCoin。方法中调用了ERC20的call方法<code>balanceOf</code>，来查询<code>accounts[0]</code>也就是发起合约的帐号中有多少tinycoin的余额。然后用<code>assert</code>验证余额是否和期望值一样。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">it(<span class="string">"should put 10000 tinycoin in the first account"</span>, function()&#123;</span><br><span class="line">    return TinyCoin.deployed().then(<span class="name">function</span>(<span class="name">instance</span>) &#123;</span><br><span class="line">        return instance.balanceOf.call(<span class="name">accounts</span>[<span class="number">0</span>])<span class="comment">;</span></span><br><span class="line">    &#125;)</span><br><span class="line">    .then(<span class="name">balance=&gt;</span>&#123;</span><br><span class="line">        balance = web3.fromWei(<span class="name">balance</span>)</span><br><span class="line">        assert.equal(    <span class="name">balance</span>, <span class="number">10000</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>另一个测试样例中发起了一个token交易，帐号0向帐号1发送了10个tinycoin。在合约中，发起转账会出发一个事件，叫Transfer，Transfer中有三个数据：发送方/接收方/交易数量，因此这里我们还需要验证是否抛出了Transfer以及Transfer中的数据是否正确：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = 0; i &lt; <span class="keyword">ret</span>.logs.length; i++) &#123;</span><br><span class="line">  <span class="keyword">var</span> <span class="keyword">log</span> = <span class="keyword">ret</span>.logs[i];</span><br><span class="line">  <span class="keyword">if</span>(<span class="keyword">log</span>.event == <span class="string">"Transfer"</span>)</span><br><span class="line">        eventTransfer = <span class="built_in">log</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>完成测试脚本以后，我们还是转到刚才的<code>truffle develop</code>的命令行界面，输入<code>test</code>即可开始运行测试脚本，会输出测试结果：<br><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">truffle(develop)&gt; test</span><br><span class="line">Using network <span class="string">'develop'</span>.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  Contract: TinyCoin</span><br><span class="line">    ✓ should <span class="built_in">put</span> <span class="number">10000</span> tinycoin <span class="keyword">in</span> <span class="keyword">the</span> <span class="keyword">first</span> account</span><br><span class="line">    ✓ should succeed <span class="keyword">in</span> <span class="keyword">a</span> transfer</span><br><span class="line">      * status should be <span class="number">0x1</span></span><br><span class="line">      * should have <span class="keyword">a</span> Transfer event <span class="keyword">with</span> correct output (<span class="number">41</span>ms)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="number">2</span> passing (<span class="number">83</span>ms)</span><br></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本篇主要介绍了truffle的核心功能的基本操作，包括编写合约、迁移脚本、搭建测试环境、打包、调试和测试脚本。更多具体功能请参照官网文档，或关注这里的更新</p>
+<h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><ul>
+<li>truffle official website <a href="https://truffleframework.com/" target="_blank" rel="noopener">https://truffleframework.com/</a></li>
+<li>truffle docs <a href="https://truffleframework.com/docs" target="_blank" rel="noopener">https://truffleframework.com/docs</a></li>
+<li>truffle tutorials <a href="https://truffleframework.com/tutorials" target="_blank" rel="noopener">https://truffleframework.com/tutorials</a></li>
+<li>web3js docs <a href="https://web3js.readthedocs.io/en/1.0/" target="_blank" rel="noopener">https://web3js.readthedocs.io/en/1.0/</a></li>
+<li>本项目github地址 <a href="https://github.com/TinyCalf/SmartContracts" target="_blank" rel="noopener">https://github.com/TinyCalf/SmartContracts</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>TinyCalf</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.tiny-calf.com/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/" title="truffle以太坊智能合约开发环境搭建">http://www.tiny-calf.com/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"></a><br><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/themes/next/layout/ethereum/" rel="tag"># ethereum</a>
+          
+            <a href="/themes/next/layout/solidity/" rel="tag"># solidity</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/31/以ERC20为例讲解Solidity编程/" rel="next" title="以ERC20为例讲解Solidity编程">
+                <i class="fa fa-chevron-left"></i> 以ERC20为例讲解Solidity编程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/20180629-Parity搭建以太坊节点/" rel="prev" title="Parity搭建以太坊节点">
+                Parity搭建以太坊节点 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="TinyCalf">
+            
+              <p class="site-author-name" itemprop="name">TinyCalf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/TinyCalf" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:839560084@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://stackoverflow.com/users/7047194/jonathan-zhu" target="_blank" title="StackOverflow"><i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="/about/" target="_blank" title="Wechat"><i class="fa fa-fw fa-wechat"></i>Wechat</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-npm-nodejs"><span class="nav-number">1.</span> <span class="nav-text">安装 npm nodejs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装truffle"><span class="nav-number">2.</span> <span class="nav-text">安装truffle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新建truffle项目"><span class="nav-number">3.</span> <span class="nav-text">新建truffle项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写一个智能合约"><span class="nav-number">4.</span> <span class="nav-text">写一个智能合约</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迁移脚本"><span class="nav-number">5.</span> <span class="nav-text">迁移脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以太坊虚拟机调试环境"><span class="nav-number">6.</span> <span class="nav-text">以太坊虚拟机调试环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动truffle自带的evm"><span class="nav-number">6.1.</span> <span class="nav-text">启动truffle自带的evm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译打包智能合约"><span class="nav-number">6.2.</span> <span class="nav-text">编译打包智能合约</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动发布合约"><span class="nav-number">6.3.</span> <span class="nav-text">自动发布合约</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调试合约"><span class="nav-number">6.4.</span> <span class="nav-text">调试合约</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编写测试脚本"><span class="nav-number">6.5.</span> <span class="nav-text">编写测试脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关链接"><span class="nav-number">8.</span> <span class="nav-text">相关链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TinyCalf 京ICP备17029524号</span>
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three-waves.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'W7fnson0Rdpm3nyj9vrN55ta-gzGzoHsz',
+        appKey: 'x2Tt2444c9CeLvNT9phuInev',
+        placeholder: '想说什么就说点吧',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("W7fnson0Rdpm3nyj9vrN55ta-gzGzoHsz", "x2Tt2444c9CeLvNT9phuInev");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            
+            counter.save(null, {
+              success: function(counter) {
+                
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.get('time'));
+                
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            
+              var newcounter = new Counter();
+              /* Set ACL */
+              var acl = new AV.ACL();
+              acl.setPublicReadAccess(true);
+              acl.setPublicWriteAccess(true);
+              newcounter.setACL(acl);
+              /* End Set ACL */
+              newcounter.set("title", title);
+              newcounter.set("url", url);
+              newcounter.set("time", 1);
+              newcounter.save(null, {
+                success: function(newcounter) {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                },
+                error: function(newcounter, error) {
+                  console.log('Failed to create');
+                }
+              });
+            
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

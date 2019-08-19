@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/180.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/180.png?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Ethereum目前有两种节点，分别是go-ethereum（简称geth）和Parity。因为Parity出现的时间较晚，解决了geth节点中的许多问题，拥有更好的性能，所以后面所有关于以太坊的讲解都会以Parity环境作为基础。本篇主要说明了Parity节点的搭建和配置。  Parity 安装Parity节点可以被安装在本地或者服务器。有多种方式可以安装，包括编译、Docker、发布版安装文">
+<meta name="keywords" content="parity,ethereum">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Parity搭建以太坊节点">
+<meta property="og:url" content="http://www.tiny-calf.com/2018/06/29/20180629-Parity搭建以太坊节点/index.html">
+<meta property="og:site_name" content="Tiny Calf">
+<meta property="og:description" content="Ethereum目前有两种节点，分别是go-ethereum（简称geth）和Parity。因为Parity出现的时间较晚，解决了geth节点中的许多问题，拥有更好的性能，所以后面所有关于以太坊的讲解都会以Parity环境作为基础。本篇主要说明了Parity节点的搭建和配置。  Parity 安装Parity节点可以被安装在本地或者服务器。有多种方式可以安装，包括编译、Docker、发布版安装文">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-19T11:22:07.558Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Parity搭建以太坊节点">
+<meta name="twitter:description" content="Ethereum目前有两种节点，分别是go-ethereum（简称geth）和Parity。因为Parity出现的时间较晚，解决了geth节点中的许多问题，拥有更好的性能，所以后面所有关于以太坊的讲解都会以Parity环境作为基础。本篇主要说明了Parity节点的搭建和配置。  Parity 安装Parity节点可以被安装在本地或者服务器。有多种方式可以安装，包括编译、Docker、发布版安装文">
+
+
+
+
+
+
+  <link rel="canonical" href="http://www.tiny-calf.com/2018/06/29/20180629-Parity搭建以太坊节点/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Parity搭建以太坊节点 | Tiny Calf</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d9139a8cd69f64bff973069819adf72";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+      <div class="site-meta-headline">
+        <a>
+          <img class="custom-logo-image" src="/images/logo.png" alt="Tiny Calf" style="width:150px">
+        </a>
+      </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-booklist">
+    <a href="/booklist/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+</li>
+
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.tiny-calf.com/2018/06/29/20180629-Parity搭建以太坊节点/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="TinyCalf">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tiny Calf">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Parity搭建以太坊节点</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-29T14:01:31+08:00">2018-06-29</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/区块链/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/29/20180629-Parity搭建以太坊节点/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/06/29/20180629-Parity搭建以太坊节点/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/29/20180629-Parity搭建以太坊节点/" class="leancloud_visitors" data-flag-title="Parity搭建以太坊节点">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>Ethereum目前有两种节点，分别是go-ethereum（简称geth）和Parity。因为Parity出现的时间较晚，解决了geth节点中的许多问题，拥有更好的性能，所以后面所有关于以太坊的讲解都会以Parity环境作为基础。本篇主要说明了Parity节点的搭建和配置。</p>
+</blockquote>
+<h2 id="Parity-安装"><a href="#Parity-安装" class="headerlink" title="Parity 安装"></a>Parity 安装</h2><p>Parity节点可以被安装在本地或者服务器。有多种方式可以安装，包括编译、Docker、发布版安装文件，并且支持Windows/OS_X/Linux多个系统。关于编译安装和Docker安装，在Parity项目的<a href="https://github.com/paritytech/parity" target="_blank" rel="noopener">README</a>文件中有详细说明。这里只说明最简单的安装文件安装。<br><a id="more"></a></p>
+<ul>
+<li>首先下载对应系统的发布版文件<a href="https://github.com/paritytech/parity/releases" target="_blank" rel="noopener">传送门</a></li>
+<li>各个系统上双击下载文件按照提供的界面指引安装</li>
+<li>在终端输入<code>parity --version</code>确认安装成功，安装成功输出如下</li>
+</ul>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Parity</span><br><span class="line">  <span class="built_in">version</span> Parity/v1<span class="number">.11</span><span class="number">.4</span>-beta-cc44ae9cb<span class="number">-20180619</span>/x86_64-linux-gnu/rustc1<span class="number">.26</span><span class="number">.1</span></span><br><span class="line">Copyright <span class="number">2015</span>, <span class="number">2016</span>, <span class="number">2017</span>, <span class="number">2018</span> Parity Technologies (UK) Ltd</span><br><span class="line">License GPLv3+: GNU GPL <span class="built_in">version</span> <span class="number">3</span> <span class="keyword">or</span> later &lt;<span class="keyword">http</span>://gnu.org/licenses/gpl.html&gt;.</span><br><span class="line">This is free software: you are free <span class="built_in">to</span> change <span class="keyword">and</span> redistribute <span class="keyword">it</span>.</span><br><span class="line">There is NO WARRANTY, <span class="built_in">to</span> <span class="keyword">the</span> extent permitted <span class="keyword">by</span> law.</span><br><span class="line"></span><br><span class="line">By Wood/Paronyan/Kotewicz/Drwięga/Volf</span><br><span class="line">   Habermeier/Czaban/Greeff/Gotchac/Redmann</span><br></pre></td></tr></table></figure>
+<ul>
+<li>所有parity的相关操作，包括大量配置项，都通过<code>parity</code>这个命令来实现，可通过<code>parity --help</code>查看所有配置项</li>
+</ul>
+<h2 id="Parity-参数配置"><a href="#Parity-参数配置" class="headerlink" title="Parity 参数配置"></a>Parity 参数配置</h2><p>parity的参数配置的具体说明有一个<a href="https://wiki.parity.io/Configuring-Parity.html" target="_blank" rel="noopener">英文文档</a>可以参考。为了方便快速学习，我这里简单说明一下。</p>
+<h3 id="两种参数形式"><a href="#两种参数形式" class="headerlink" title="两种参数形式"></a>两种参数形式</h3><p>第一种是像 <code>parity --help</code>中显示的一样，每个参数都用命令行中的flag表示。如：<br><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">parity --chain</span>=<span class="string">"ropsten"</span></span><br></pre></td></tr></table></figure></p>
+<p>表示让parity节点运行在ropsten测试链中。但是这种方式过于繁琐，参数较多的时候不便于管理，所以可以使用第二种toml文件的方式。首先我们要创建一个 <code>config.toml</code>文件，在里面简单写几个配置项：<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#config.toml</span></span><br><span class="line"><span class="section">[parity]</span></span><br><span class="line"><span class="attr">mode</span> = <span class="string">"last"</span></span><br><span class="line"><span class="attr">chain</span> = <span class="string">"homestead"</span></span><br><span class="line"><span class="attr">light</span> = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="section">[account]</span></span><br><span class="line"><span class="attr">unlock</span> = [<span class="string">"0xdeadbeefcafe0000000000000000000000000000"</span>]</span><br><span class="line"><span class="attr">password</span> = [<span class="string">"/home/user/.safe/password.file"</span>]</span><br><span class="line"><span class="attr">keys_iterations</span> = <span class="number">10240</span></span><br><span class="line"></span><br><span class="line"><span class="section">[ui]</span></span><br><span class="line"><span class="attr">force</span> = <span class="literal">false</span></span><br><span class="line"><span class="attr">disable</span> = <span class="literal">false</span></span><br><span class="line"><span class="attr">port</span> = <span class="number">8180</span></span><br><span class="line"><span class="attr">interface</span> = <span class="string">"127.0.0.1"</span></span><br><span class="line"><span class="attr">path</span> = <span class="string">"$HOME/.local/share/io.parity.ethereum/signer"</span></span><br></pre></td></tr></table></figure></p>
+<p>toml中的条理比较清晰，将参数所属的不同模块区分开来，比如<code>light</code>参数表示是否使用light模式同步，它属于<code>parity</code>模块的属性，所以写在<code>[parity]</code>下面。toml可以使<code>#</code>来注释。help中的大多数命令行的flag在toml中都有对应的参数（少部分没有），但是参数名称略有不同，这里再提供一个完整的toml文件以供参考：<a href="https://github.com/paritytech/parity/blob/master/parity/cli/tests/config.full.toml" target="_blank" rel="noopener">config.full.toml</a>. 该文件中的值即为所有项的默认值，但是偶尔因为版本更替会略有所不同。写好toml文件以后，我们就可以通过如下方法启动parity：<br><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parity --<span class="built_in">config</span> path/to/<span class="built_in">config</span>.toml</span><br></pre></td></tr></table></figure></p>
+<h3 id="最常用参数详解"><a href="#最常用参数详解" class="headerlink" title="最常用参数详解"></a>最常用参数详解</h3><p>本篇目的是快速学习上手，所以就不列举太多，请看下面这个toml<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">[parity]</span><br><span class="line"></span><br><span class="line"><span class="attribute">mode</span>=<span class="string">"active"</span></span><br><span class="line"><span class="comment">#这个是parity的同步模式。active表示持续同步区块；passive表示间歇性同步区块；dark表示只有在parity的rpc端口得到命令时才同步区块；last表示使用上次启动时的值</span></span><br><span class="line"></span><br><span class="line">chain = <span class="string">"foundation"</span></span><br><span class="line"><span class="comment"># 该参数可以让parity节点运行在不同的链上；foundation和mainnet都表示eth主网络；classic表示以太经典；ropsten等是以太坊各种开发社区搞的公有测试练，一般都有对应的水龙头网站可以获取免费的币以供测试。</span></span><br><span class="line"></span><br><span class="line">base_path = <span class="string">"./data"</span></span><br><span class="line"><span class="comment"># 数据存放位置，区块信息、交易信息等数据文件都会保存在指定的目录下，默认`~/.parity`中，所以为了方便管理，我们让数据生成在指定的文件夹下面</span></span><br><span class="line"></span><br><span class="line">light = <span class="literal">false</span></span><br><span class="line"><span class="comment"># light模式只同步区块头信息，因此能快速同步到最新块，但是正常项目中都需要比较完整的区块信息，所以这里设置成false</span></span><br><span class="line"></span><br><span class="line">no_persistent_txqueue = <span class="literal">true</span></span><br><span class="line"><span class="comment"># 这个参数和交易有关。节点关闭的时候可能内存中会有部分交易没来得及发出去，如果这里设置成false，下次启动节点的时候还能继续发送这里面的交易；如果设置成true，就丢失了这些交易，需要重新发送。</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[rpc]</span><br><span class="line"><span class="comment"># rpc相当于http接口，可通过http请求的形式与parity交互</span></span><br><span class="line"></span><br><span class="line"><span class="builtin-name">disable</span> = <span class="literal">false</span></span><br><span class="line"><span class="comment"># 是否关闭rpc接口</span></span><br><span class="line"></span><br><span class="line">port = 39842</span><br><span class="line"><span class="comment"># rpc接口的端口号</span></span><br><span class="line"></span><br><span class="line">interface = <span class="string">"local"</span></span><br><span class="line"><span class="comment"># rpc接口的ip，local即为localhost/127.0.0.1；也可以设置成0.0.0.0或者节点服务器所ip</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cors = [<span class="string">"*"</span>]</span><br><span class="line"><span class="comment"># 设置可访问rpc端口ip列表，设置成*即所有人都能访问</span></span><br><span class="line"></span><br><span class="line">apis = [<span class="string">"all"</span>]</span><br><span class="line"><span class="comment"># 设置开放的api类型，api类型较多，可以以数组的形式传入多个，需要开放所有api时即设置成all</span></span><br><span class="line"></span><br><span class="line">hosts = [<span class="string">"all"</span>]</span><br><span class="line"><span class="comment"># 设置host，host其实是浏览器Host header，一般设置成all</span></span><br><span class="line"></span><br><span class="line">server_threads = 10</span><br><span class="line"><span class="comment"># 可同时访问的线程数量，这个设置非常有用，在geth中没有这个设置所以容易导致内存不安全</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[websockets]</span><br><span class="line"><span class="comment"># websockets是另一种与parity的交互形式，他能提供rpc不能提供的信息，比如能订阅新的交易并收到推送。</span></span><br><span class="line"><span class="comment"># 以下内容和rpc一致</span></span><br><span class="line"></span><br><span class="line"><span class="builtin-name">disable</span> = <span class="literal">false</span></span><br><span class="line">port = 39843</span><br><span class="line">interface = <span class="string">"local"</span></span><br><span class="line">origins = [<span class="string">"all"</span>]</span><br><span class="line"><span class="comment"># 浏览器的origin header</span></span><br><span class="line"></span><br><span class="line">apis = [<span class="string">"all"</span>]</span><br><span class="line">hosts = [<span class="string">"all"</span>]</span><br><span class="line"></span><br><span class="line">[ui]</span><br><span class="line">parity提供一种web交互的方法，就是这个ui，生成一个网页版的交互界面</span><br><span class="line"></span><br><span class="line">force = <span class="literal">false</span></span><br><span class="line"><span class="builtin-name">disable</span> = <span class="literal">false</span></span><br><span class="line">port = 39844</span><br><span class="line">interface = <span class="string">"all"</span></span><br><span class="line">path = <span class="string">"./data/signer"</span></span><br><span class="line"><span class="comment"># 网页需要token来访问，这个是服务器端token的存放地址</span></span><br><span class="line"></span><br><span class="line">[network]</span><br><span class="line"><span class="comment">#parity与其他节点交互的网络设置，比如区块信息的同步就是靠这个网络</span></span><br><span class="line"></span><br><span class="line">port = 30303</span><br><span class="line"><span class="comment">#与其他节点同步用的端口</span></span><br><span class="line"></span><br><span class="line">min_peers = 10</span><br><span class="line"><span class="comment">#最少节点数量，达到这个数量的连接数以后才开始同步并认为同步的信息是正确的；同步的节点越多，就能保证信息越准确；</span></span><br><span class="line">max_peers = 100</span><br><span class="line"><span class="comment">#最大节点数量，防止连接过多节点导致消耗过多资源</span></span><br></pre></td></tr></table></figure></p>
+<p>全面的参数信息会通过其他文章来说明。</p>
+<h2 id="ParityStartUpTool"><a href="#ParityStartUpTool" class="headerlink" title="ParityStartUpTool"></a>ParityStartUpTool</h2><p><a href="https://github.com/TinyCalf/ParityStartUpTool" target="_blank" rel="noopener">ParityStartUpTool</a>是我写的一个简单的控制工具。其中，start是启动用的shell脚本，就一句代码：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">parity ui --geth --config=<span class="string">"./config.toml"</span></span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>目前要启动parity的web界面还是需要在命令行中加上<code>ui</code>，如果是在本地的话，会自动启动浏览器。</li>
+<li>了解geth的朋友一定会知道如何用web3.js的语法与节点进行交互，但是那是geth上的操作，想让parity也支持这种操作只要在parity中加上<code>--geth</code>，然后用<code>geth attach http://127.0.0.1:8545[rpc端口默认8545]</code>即可，在ParityStartUpTool中有一个<code>attach</code>的脚本能完成这个工作。<br>（rpc端口正常通过http请求就能和节点交互，web3.js简化了这个操作，交互模式变为简单的指令）</li>
+</ul>
+<h2 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h2><p>如果你连上了mainnet或者其中一条公有测试链，那么Parity将需要一些时间来同步，同步后才能进行区块链的所有操作。Parity采用快照模式打包下载大量区块链数据，对已经有大量确认数的历史块不再做校验；当下载高度接近最高块时，才逐个下载数据，大大提高了同步速度。你可以在parity的ui界面，或者<code>geth attach</code>中使用<code>eth.syncing</code>来查看同步状态</p>
+<h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><ul>
+<li>Parity 官网 <a href="https://www.parity.io/" target="_blank" rel="noopener">https://www.parity.io/</a></li>
+<li>Parity 项目地址 <a href="https://github.com/paritytech/parity" target="_blank" rel="noopener">https://github.com/paritytech/parity</a></li>
+<li>Parity 官方英文文档 <a href="https://wiki.parity.io" target="_blank" rel="noopener">https://wiki.parity.io</a></li>
+<li>Parity 发布版下载地址 <a href="https://github.com/paritytech/parity/releases" target="_blank" rel="noopener">https://github.com/paritytech/parity/releases</a></li>
+</ul>
+<p><em>“不要用geth当节点”</em></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>TinyCalf</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.tiny-calf.com/2018/06/29/20180629-Parity搭建以太坊节点/" title="Parity搭建以太坊节点">http://www.tiny-calf.com/2018/06/29/20180629-Parity搭建以太坊节点/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"></a><br><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/themes/next/layout/parity/" rel="tag"># parity</a>
+          
+            <a href="/themes/next/layout/ethereum/" rel="tag"># ethereum</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/27/20180606-truffle以太坊智能合约开发环境搭建/" rel="next" title="truffle以太坊智能合约开发环境搭建">
+                <i class="fa fa-chevron-left"></i> truffle以太坊智能合约开发环境搭建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/20180629-以太坊应用开发学习路径/" rel="prev" title="以太坊应用开发学习路径">
+                以太坊应用开发学习路径 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="TinyCalf">
+            
+              <p class="site-author-name" itemprop="name">TinyCalf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/TinyCalf" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:839560084@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://stackoverflow.com/users/7047194/jonathan-zhu" target="_blank" title="StackOverflow"><i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="/about/" target="_blank" title="Wechat"><i class="fa fa-fw fa-wechat"></i>Wechat</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Parity-安装"><span class="nav-number">1.</span> <span class="nav-text">Parity 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Parity-参数配置"><span class="nav-number">2.</span> <span class="nav-text">Parity 参数配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#两种参数形式"><span class="nav-number">2.1.</span> <span class="nav-text">两种参数形式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最常用参数详解"><span class="nav-number">2.2.</span> <span class="nav-text">最常用参数详解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ParityStartUpTool"><span class="nav-number">3.</span> <span class="nav-text">ParityStartUpTool</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同步"><span class="nav-number">4.</span> <span class="nav-text">同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关链接"><span class="nav-number">5.</span> <span class="nav-text">相关链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TinyCalf 京ICP备17029524号</span>
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three-waves.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'W7fnson0Rdpm3nyj9vrN55ta-gzGzoHsz',
+        appKey: 'x2Tt2444c9CeLvNT9phuInev',
+        placeholder: '想说什么就说点吧',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("W7fnson0Rdpm3nyj9vrN55ta-gzGzoHsz", "x2Tt2444c9CeLvNT9phuInev");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            
+            counter.save(null, {
+              success: function(counter) {
+                
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.get('time'));
+                
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            
+              var newcounter = new Counter();
+              /* Set ACL */
+              var acl = new AV.ACL();
+              acl.setPublicReadAccess(true);
+              acl.setPublicWriteAccess(true);
+              newcounter.setACL(acl);
+              /* End Set ACL */
+              newcounter.set("title", title);
+              newcounter.set("url", url);
+              newcounter.set("time", 1);
+              newcounter.save(null, {
+                success: function(newcounter) {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                },
+                error: function(newcounter, error) {
+                  console.log('Failed to create');
+                }
+              });
+            
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.0.6" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/180.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32.png?v=6.0.6">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16.png?v=6.0.6">
+
+
+  <link rel="mask-icon" href="/images/180.png?v=6.0.6" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.6',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="bitcore 是搭建区块链浏览器 insight 和半中心化钱包 copay 的核心;由于 bitcore 完全基于 bitcoin core 所编译的二进制程序 bitcoind ，所以我们完全可以用我们已经开发的山寨币来作为bitcore的基础，开发我们自己的区块链浏览器和钱包  了解bitcorebitcore 的官网，包括了介绍、论坛、文档，我这就不多介绍了，我后面主要讲怎么把我们的山">
+<meta name="keywords" content="区块链,比特币,insight,bitcore">
+<meta property="og:type" content="article">
+<meta property="og:title" content="搭建区块链浏览器 insight">
+<meta property="og:url" content="http://www.tiny-calf.com/2017/07/20/搭建区块链浏览器/index.html">
+<meta property="og:site_name" content="Tiny Calf">
+<meta property="og:description" content="bitcore 是搭建区块链浏览器 insight 和半中心化钱包 copay 的核心;由于 bitcore 完全基于 bitcoin core 所编译的二进制程序 bitcoind ，所以我们完全可以用我们已经开发的山寨币来作为bitcore的基础，开发我们自己的区块链浏览器和钱包  了解bitcorebitcore 的官网，包括了介绍、论坛、文档，我这就不多介绍了，我后面主要讲怎么把我们的山">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.tiny-calf.com/images/insight1.png">
+<meta property="og:image" content="http://www.tiny-calf.com/images/insight2.png">
+<meta property="og:image" content="http://www.tiny-calf.com/images/insight3.png">
+<meta property="og:updated_time" content="2019-08-19T11:22:07.561Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="搭建区块链浏览器 insight">
+<meta name="twitter:description" content="bitcore 是搭建区块链浏览器 insight 和半中心化钱包 copay 的核心;由于 bitcore 完全基于 bitcoin core 所编译的二进制程序 bitcoind ，所以我们完全可以用我们已经开发的山寨币来作为bitcore的基础，开发我们自己的区块链浏览器和钱包  了解bitcorebitcore 的官网，包括了介绍、论坛、文档，我这就不多介绍了，我后面主要讲怎么把我们的山">
+<meta name="twitter:image" content="http://www.tiny-calf.com/images/insight1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://www.tiny-calf.com/2017/07/20/搭建区块链浏览器/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>搭建区块链浏览器 insight | Tiny Calf</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d9139a8cd69f64bff973069819adf72";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+      <div class="site-meta-headline">
+        <a>
+          <img class="custom-logo-image" src="/images/logo.png" alt="Tiny Calf" style="width:150px">
+        </a>
+      </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-booklist">
+    <a href="/booklist/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+</li>
+
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.tiny-calf.com/2017/07/20/搭建区块链浏览器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="TinyCalf">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tiny Calf">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">搭建区块链浏览器 insight</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-20T23:11:54+08:00">2017-07-20</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/区块链/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/20/搭建区块链浏览器/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2017/07/20/搭建区块链浏览器/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/07/20/搭建区块链浏览器/" class="leancloud_visitors" data-flag-title="搭建区块链浏览器 insight">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p><em>bitcore</em> 是搭建区块链浏览器 <em>insight</em> 和半中心化钱包 <em>copay</em> 的核心;由于 <em>bitcore</em> 完全基于 <em>bitcoin core</em> 所编译的二进制程序 <em>bitcoind</em> ，所以我们完全可以用我们已经开发的山寨币来作为bitcore的基础，开发我们自己的区块链浏览器和钱包</p>
+</blockquote>
+<h2 id="了解bitcore"><a href="#了解bitcore" class="headerlink" title="了解bitcore"></a>了解<em>bitcore</em></h2><p><em>bitcore</em> 的官网，包括了介绍、论坛、文档，我这就不多介绍了，我后面主要讲怎么把我们的山寨币用在<em>bitcore</em>上：<br><a href="https://bitcore.io/" target="_blank" rel="noopener">https://bitcore.io/</a><br><a id="more"></a><br>讲简单点，各个模块的关系就是：bitcoind -&gt; bitcore-&gt; insight-ui(区块链浏览器)和insight-api（区块链接口）-&gt; bws(bitcore-wallet-service) -&gt; copay和bitcore-wallet钱包;后者基于前者之上。关于bws和copay我们下节会讲。</p>
+<h2 id="截图预览"><a href="#截图预览" class="headerlink" title="截图预览"></a>截图预览</h2><p><img src="/images/insight1.png" alt><br><img src="/images/insight2.png" alt><br><img src="/images/insight3.png" alt></p>
+<h2 id="运行-bitcore-及-insight"><a href="#运行-bitcore-及-insight" class="headerlink" title="运行 bitcore 及 insight"></a>运行 <em>bitcore</em> 及 <em>insight</em></h2><h3 id="重编译-Bitcoind"><a href="#重编译-Bitcoind" class="headerlink" title="重编译 Bitcoind"></a>重编译 <em>Bitcoind</em></h3><p>我前几章就是<em>bitcoin core</em>的编译教程，并且在此基础上通过修改部分参数创造了新币。但是现在我们要做一些调整，让<em>bitcoind</em>程序适应<em>bitcore</em>。方法很简单，用<em>bitcore</em>官方提供的<em>bitcoin core</em>编译就行了，代码和我们之前开发的v0.12几乎没变化，只是多了几个可供<em>bitcore</em>调用的RPC接口，和我们改动的部分没说明关系。这样的话我们直接把参数换到新的工程里就好了，我们接下来要编译的整套工程会基于<em>v0.12.1-bitbore-4</em>这个版本，在这里下载（千万别下别的版本）：<br><br><a href="https://github.com/Jonathan-ZHU/bitcoin/tree/v0.12.1-bitcore-4" target="_blank" rel="noopener">https://github.com/Jonathan-ZHU/bitcoin/tree/v0.12.1-bitcore-4</a><br>调整的文件也就是那几个，大概是：<em>chainparams.cpp/chainparamsseed.h/consensus.h</em> 等等，根据自己的来就行，重新编译好我们把 <em>bitcoind</em> 拿出来，按照我写过的教程做个<a href="http://www.tiny-calf.com/chuang-zao-ni-de-shu-zi-huo-bi-2-fa-bu-unixan-zhuang-cheng-xu/">unix发布程序</a>就行，别忘了把bitcoin-cli也放进去，不然不小心打开了都关不掉，然后直接放到linux服务器上安装。如果还是缺少zmq库的话就再装一下呗～：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install libzmq3-dev build-essential</span><br></pre></td></tr></table></figure></p>
+<p> ==注意：bitcoind编译的时候，zmq环境是选装的，但是要使用bitcore，zmq是必装的，没装的滚回去装吧～==<br><br><br><em>另外，本地调试也是没问题的,看着办吧</em></p>
+<h3 id="安装Node-js"><a href="#安装Node-js" class="headerlink" title="安装Node.js"></a>安装<em>Node.js</em></h3><p>我单独写过nvm快速安装教程，<a href="http://www.tiny-calf.com/2017/07/20/Node.js%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85/">传送门</a>。</p>
+<h2 id="安装bitcore"><a href="#安装bitcore" class="headerlink" title="安装bitcore"></a>安装<em>bitcore</em></h2><h3 id="全局安装bitcore"><a href="#全局安装bitcore" class="headerlink" title="全局安装bitcore"></a>全局安装<em>bitcore</em></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g bitcore</span><br></pre></td></tr></table></figure>
+<p>然后执行看看能不能运行：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitcored</span><br></pre></td></tr></table></figure></p>
+<p>你是不会成功的！！！<br><br>没错，这就是bitcore留下的一个大坑，报错如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">throw new Error(message);</span><br><span class="line">    ^</span><br><span class="line">Error: More than one instance of bitcore-lib found. Please make sure to require bitcore-lib and check that submodules <span class="keyword">do</span> not also include their own bitcore-lib dependency.</span><br></pre></td></tr></table></figure>
+<p>原因是<em>bitcore</em>的各个子模块也带着<em>bitcore-lib</em>，当然没关系，由于node模块是自动搜索的，本地没有会往上一层搜索，上一层没有就会找全局的，所以其实我们删掉重复的模块就行了，先找到<em>bitcore</em>全局安装的位置，刚才的报错信息里面有，由于我们之前安装了nvm所以地址大概是这样的：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/ubuntu/.nvm/versions/node/v4.8.4/lib/node_modules/bitcore</span><br></pre></td></tr></table></figure></p>
+<p>这个地址有点长，做个链接吧,地址根据自己的来哦：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ln -s ~/.nvm/versions/node/v4.8.4/lib/node_modules/bitcore ~/bitcore</span><br></pre></td></tr></table></figure></p>
+<p>进入这个目录以后,查到所有<em>bitcore-lib</em>：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ find . -name <span class="string">"bitcore-lib"</span></span><br><span class="line">./node_modules/bitcore-node/node_modules/bitcore-lib</span><br><span class="line">./node_modules/bitcore-lib</span><br><span class="line">./node_modules/insight-api/node_modules/bitcore-lib</span><br></pre></td></tr></table></figure></p>
+<p>除了根目录的都删除：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rm -r ./node_modules/bitcore-node/node_modules/bitcore-lib</span><br><span class="line">rm -r ./node_modules/insight-api/node_modules/bitcore-lib</span><br></pre></td></tr></table></figure></p>
+<p>确定自己的<em>bitcoin</em>程序是关闭的以后，启动<em>bitcored</em>，由于全局安装<em>bitcore</em>的时候把<em>insight-api</em>和<em>insight-ui</em>都装上了，所以现在可以直接查看区块连浏览器<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://YOUR_IP_ADDRESS_OR_LOCALHOST:3001/insight/</span><br></pre></td></tr></table></figure></p>
+<p>现在运行在比特币上，用的是<em>npm</em>安装时候下载的<em>bitcoind</em>，数据文件在<em>～/.bitcore/</em> 下,如果通了就关掉把，然后接下来你有两条路可以走：一个是直接在现在的<em>bitcore</em>下面开发，但是以后安装<em>bws</em>会遇到各种版本不兼容问题，需要自己来调试;第二种是通过已有的<em>bitcore</em>生成一个节点，在节点上开发，强烈推荐这种，这也是我接下来要讲的，他能直接安装对应版本的<em>bws</em>，并且引用的库相对简洁，容易开发。</p>
+<h3 id="安装-bitcore-full-node"><a href="#安装-bitcore-full-node" class="headerlink" title="安装 bitcore full node"></a>安装 <em>bitcore full node</em></h3><p>很高兴你选择了正确的道路，让我们继续,在你想要的目录下创建新节点：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitcore create NAME_OF_YOURNODE</span><br></pre></td></tr></table></figure></p>
+<p>cd以下这个目录，再运行<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitcored</span><br></pre></td></tr></table></figure></p>
+<p>不报错，能运行的话就关掉，继续安装<em>insight-ui</em>和<em>insight-api</em><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitcore install insight-api insight-ui</span><br></pre></td></tr></table></figure></p>
+<p>然后再运行<em>bitcored</em>，然后老问题又来了，<em>bitcore-lib</em>重复了，根刚才一样删除掉就行，运行成功以后打开，再在浏览器里看看能不能运行成功，成功的话就恭喜你，<em>bitcore</em>和<em>insight</em>已经成功安装，接下来我们就要让bitcore运行我们自己的山寨币了。</p>
+<h2 id="接入自己的山寨币"><a href="#接入自己的山寨币" class="headerlink" title="接入自己的山寨币"></a>接入自己的山寨币</h2><h3 id="修改bitcore-node-json"><a href="#修改bitcore-node-json" class="headerlink" title="修改bitcore-node.json"></a>修改<em>bitcore-node.json</em></h3><p>就在节点根目录下，打开这个文件，是这样的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"network"</span>: <span class="string">"livenet"</span>,</span><br><span class="line">  <span class="string">"port"</span>: <span class="number">3001</span>,</span><br><span class="line">  <span class="string">"services"</span>: [</span><br><span class="line">    <span class="string">"bitcoind"</span>,</span><br><span class="line">    <span class="string">"insight-api"</span>,</span><br><span class="line">    <span class="string">"insight-ui"</span>,</span><br><span class="line">    <span class="string">"web"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"servicesConfig"</span>: &#123;</span><br><span class="line">    <span class="string">"bitcoind"</span>: &#123;</span><br><span class="line">      <span class="string">"spawn"</span>: &#123;</span><br><span class="line">        <span class="string">"datadir"</span>: <span class="string">"./data"</span>,</span><br><span class="line">        <span class="string">"exec"</span>: <span class="string">"/home/ubuntu/.nvm/versions/node/v4.8.4/lib/node_modules/bitcore/node_modules/bitcore-node/bin/bitcoind"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里面配置了网络、接口、bitcoind地址、数据地址，这些你们都看得懂，所以既然要运行在我们的山寨币上，<strong>把<em>exec</em>换成我们刚才安装自己的<em>bitcoind</em>的地址就可以了</strong>，数据地址不变也挺好，因为我们刚才启动过比特币，所以我们进入<em>./data</em>把刚才下载的区块链删掉，以免冲突。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ rm -r blocks</span><br><span class="line">$ rm -r chainstate</span><br></pre></td></tr></table></figure></p>
+<h3 id="查看bitcoin-conf"><a href="#查看bitcoin-conf" class="headerlink" title="查看bitcoin.conf"></a>查看<em>bitcoin.conf</em></h3><p>这个文件不用改，只需要了解一下，在<em>data</em>里面，用来配置<em>bitcoind</em>启动时的各项参数。</p>
+<h3 id="修改networks-js"><a href="#修改networks-js" class="headerlink" title="修改networks.js"></a>修改<em>networks.js</em></h3><p>现在还不要急着打开，因为网络参数还没有改，要改成我们山寨币的。文件位置在这：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./node_modules/bitcore-lib/lib/networks.js</span><br></pre></td></tr></table></figure></p>
+<p>找到这串代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">addNetwork(&#123;</span><br><span class="line">  name: <span class="string">'livenet'</span>,</span><br><span class="line">  alias: <span class="string">'mainnet'</span>,</span><br><span class="line">  pubkeyhash: <span class="number">0x00</span>,</span><br><span class="line">  privatekey: <span class="number">0x80</span>,</span><br><span class="line">  scripthash: <span class="number">0x05</span>,</span><br><span class="line">  xpubkey: <span class="number">0x0488b21e</span>,</span><br><span class="line">  xprivkey: <span class="number">0x0488ade4</span>,</span><br><span class="line">  networkMagic: <span class="number">0xf9beb4d9</span>,</span><br><span class="line">  port: <span class="number">8333</span>,</span><br><span class="line">  dnsSeeds: [</span><br><span class="line">    <span class="string">'seed.bitcoin.sipa.be'</span>,</span><br><span class="line">    <span class="string">'dnsseed.bluematt.me'</span>,</span><br><span class="line">    <span class="string">'dnsseed.bitcoin.dashjr.org'</span>,</span><br><span class="line">    <span class="string">'seed.bitcoinstats.com'</span>,</span><br><span class="line">    <span class="string">'seed.bitnodes.io'</span>,</span><br><span class="line">    <span class="string">'bitseed.xf2.org'</span></span><br><span class="line">  ]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>把你之前定义在<em>bitcoin core</em>中的参数对应过来改一下，==需要注意的是这里的<em>pubkeyhash</em>等等，是用16进制的==，千万别搞错，要用10进制的话把<em>0x</em>删掉，劳资就因为这个问题搞了一整天才发现。</p>
+<h2 id="Finally"><a href="#Finally" class="headerlink" title="Finally"></a>Finally</h2><p>没什么问题的话在节点根目录执行<em>bitcored</em>打开吧，你已经有自己的区块链浏览器了嘿～然后我们下一章将怎么接入copay钱包，那样的话你将拥有android/iOS/MacOS/Win等所有平台的钱包客户端。</p>
+<h2 id="守护进程呢？"><a href="#守护进程呢？" class="headerlink" title="守护进程呢？"></a>守护进程呢？</h2><p>特么我也不知道，官网的文档根本就不对，先用nohup代替一下把，反正也挺好用的:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ cd yournode</span><br><span class="line">$ nohup bitcored &amp;</span><br></pre></td></tr></table></figure>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><h3 id="RPC端口"><a href="#RPC端口" class="headerlink" title="RPC端口"></a><em>RPC</em>端口</h3><p>如果你的山寨币改过RPC端口的话，需要在启动 <em>bitcoind</em> 的配置文件 <em>bitcoin.conf</em> 里重新写上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpcport=99999</span><br></pre></td></tr></table></figure>
+<p>虽然 <em>bitcoind</em> 在运行的时候会找到默认端口，但是 <em>insight-api</em> 会搜索该配置文件，如果没有设置的话默认还是8332</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Jonathan</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.tiny-calf.com/2017/07/20/搭建区块链浏览器/" title="搭建区块链浏览器 insight">http://www.tiny-calf.com/2017/07/20/搭建区块链浏览器/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"></a><br><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/themes/next/layout/区块链/" rel="tag"># 区块链</a>
+          
+            <a href="/themes/next/layout/比特币/" rel="tag"># 比特币</a>
+          
+            <a href="/themes/next/layout/insight/" rel="tag"># insight</a>
+          
+            <a href="/themes/next/layout/bitcore/" rel="tag"># bitcore</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/20/Node.js快速安装/" rel="next" title="Nodejs快速安装">
+                <i class="fa fa-chevron-left"></i> Nodejs快速安装
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/04/在Ubuntu上配置iptables/" rel="prev" title="在Ubuntu上配置iptables">
+                在Ubuntu上配置iptables <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/me.jpg" alt="TinyCalf">
+            
+              <p class="site-author-name" itemprop="name">TinyCalf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/TinyCalf" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:839560084@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://stackoverflow.com/users/7047194/jonathan-zhu" target="_blank" title="StackOverflow"><i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="/about/" target="_blank" title="Wechat"><i class="fa fa-fw fa-wechat"></i>Wechat</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#了解bitcore"><span class="nav-number">1.</span> <span class="nav-text">了解bitcore</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#截图预览"><span class="nav-number">2.</span> <span class="nav-text">截图预览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行-bitcore-及-insight"><span class="nav-number">3.</span> <span class="nav-text">运行 bitcore 及 insight</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#重编译-Bitcoind"><span class="nav-number">3.1.</span> <span class="nav-text">重编译 Bitcoind</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Node-js"><span class="nav-number">3.2.</span> <span class="nav-text">安装Node.js</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装bitcore"><span class="nav-number">4.</span> <span class="nav-text">安装bitcore</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全局安装bitcore"><span class="nav-number">4.1.</span> <span class="nav-text">全局安装bitcore</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-bitcore-full-node"><span class="nav-number">4.2.</span> <span class="nav-text">安装 bitcore full node</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接入自己的山寨币"><span class="nav-number">5.</span> <span class="nav-text">接入自己的山寨币</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改bitcore-node-json"><span class="nav-number">5.1.</span> <span class="nav-text">修改bitcore-node.json</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看bitcoin-conf"><span class="nav-number">5.2.</span> <span class="nav-text">查看bitcoin.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改networks-js"><span class="nav-number">5.3.</span> <span class="nav-text">修改networks.js</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Finally"><span class="nav-number">6.</span> <span class="nav-text">Finally</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#守护进程呢？"><span class="nav-number">7.</span> <span class="nav-text">守护进程呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补充"><span class="nav-number">8.</span> <span class="nav-text">补充</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RPC端口"><span class="nav-number">8.1.</span> <span class="nav-text">RPC端口</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TinyCalf 京ICP备17029524号</span>
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three-waves.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.6"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.6"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.6"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.6"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.6"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.6"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'W7fnson0Rdpm3nyj9vrN55ta-gzGzoHsz',
+        appKey: 'x2Tt2444c9CeLvNT9phuInev',
+        placeholder: '想说什么就说点吧',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("W7fnson0Rdpm3nyj9vrN55ta-gzGzoHsz", "x2Tt2444c9CeLvNT9phuInev");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            
+            counter.save(null, {
+              success: function(counter) {
+                
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.get('time'));
+                
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            
+              var newcounter = new Counter();
+              /* Set ACL */
+              var acl = new AV.ACL();
+              acl.setPublicReadAccess(true);
+              acl.setPublicWriteAccess(true);
+              newcounter.setACL(acl);
+              /* End Set ACL */
+              newcounter.set("title", title);
+              newcounter.set("url", url);
+              newcounter.set("time", 1);
+              newcounter.save(null, {
+                success: function(newcounter) {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                },
+                error: function(newcounter, error) {
+                  console.log('Failed to create');
+                }
+              });
+            
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
