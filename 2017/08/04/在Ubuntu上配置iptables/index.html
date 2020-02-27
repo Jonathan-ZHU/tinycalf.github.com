@@ -107,7 +107,7 @@
 <meta property="og:site_name" content="Tiny Calf">
 <meta property="og:description" content="列出当前规则Ubuntu服务器默认不执行任何限制，但是为了将来参考，请使用以下命令检查当前的iptable规则1sudo iptables -L">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-19T11:22:07.561Z">
+<meta property="og:updated_time" content="2019-10-30T03:26:37.642Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在Ubuntu上配置iptables">
 <meta name="twitter:description" content="列出当前规则Ubuntu服务器默认不执行任何限制，但是为了将来参考，请使用以下命令检查当前的iptable规则1sudo iptables -L">
@@ -455,7 +455,7 @@
         <h1 id="列出当前规则"><a href="#列出当前规则" class="headerlink" title="列出当前规则"></a>列出当前规则</h1><p>Ubuntu服务器默认不执行任何限制，但是为了将来参考，请使用以下命令检查当前的iptable规则<br><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">sudo iptables -L</span></span><br></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <h1 id="添加规则"><a href="#添加规则" class="headerlink" title="添加规则"></a>添加规则</h1><p>比如允许8888端口的访问：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo iptables -A INPUT -<span class="selector-tag">p</span> tcp -m tcp --dport <span class="number">8888</span> -j ACCEPT</span><br></pre></td></tr></table></figure></p>
-<h1 id="保存和恢复规则"><a href="#保存和恢复规则" class="headerlink" title="保存和恢复规则"></a>保存和恢复规则</h1><p>现在，如果要重新启动云服务器，那么所有这些iptables配置将被擦除。为了防止这种情况，请将规则保存到文件中<br><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo iptables-save&gt; <span class="regexp">/etc/i</span>ptables<span class="regexp">/rules.v4</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="保存和恢复规则"><a href="#保存和恢复规则" class="headerlink" title="保存和恢复规则"></a>保存和恢复规则</h1><p>现在，如果要重新启动云服务器，那么所有这些iptables配置将被擦除。为了防止这种情况，请将规则保存到文件中<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo iptables-save&gt; <span class="regexp">/etc/i</span>ptables/rules.v4</span><br></pre></td></tr></table></figure></p>
 <p>然后，您可以通过阅读保存的文件来简单地还原保存的规则<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">＃覆盖当前规则</span><br><span class="line">sudo iptables-restore &lt;<span class="regexp">/etc/iptables</span><span class="regexp">/rules.v4</span></span><br><span class="line"><span class="regexp">＃添加新的规则保留当前的规则</span></span><br><span class="line"><span class="regexp">sudo iptables-restore -n &lt;/etc</span><span class="regexp">/iptables/rules</span>.v4</span><br></pre></td></tr></table></figure></p>
 <p>您可以在重新启动时自动执行恢复过程，方法是安装iptables的附加软件包，以接管已保存的规则的加载。使用以下命令给它<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="builtin-name">get</span> install iptables-persistent</span><br></pre></td></tr></table></figure></p>
 <p>安装完成后，初始设置将要求保存IPv4和IPv6的当前规则，只需选择是并按两次。</p>
@@ -511,8 +511,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/20/Node.js快速安装/" rel="next" title="Nodejs快速安装">
-                <i class="fa fa-chevron-left"></i> Nodejs快速安装
+              <a href="/2017/07/20/搭建区块链浏览器/" rel="next" title="搭建区块链浏览器 insight">
+                <i class="fa fa-chevron-left"></i> 搭建区块链浏览器 insight
               </a>
             
           </div>
@@ -808,11 +808,13 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
+ <a href="http://www.beian.miit.gov.cn">
   <span class="author" itemprop="copyrightHolder">TinyCalf 京ICP备17029524号</span>
+ </a>
   
 
   
